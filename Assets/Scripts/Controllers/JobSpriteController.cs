@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 public class JobSpriteController : MonoBehaviour
 {
@@ -16,6 +17,11 @@ public class JobSpriteController : MonoBehaviour
 
     void OnJobCreated(Job _job)
     {
+        if (job_GameObject_Map.ContainsKey(_job))
+        {
+            //Debug.Log("OnJobCreated for a jobGO that already exists -- most like due to a job being re-queded instead of created");
+            return;
+        }
         //Make Sprite
         Sprite sprite = fsc.GetSpriteForFurniture(_job.jobType);
         
@@ -26,6 +32,24 @@ public class JobSpriteController : MonoBehaviour
         jobGO.name = $"{_job.jobType}_{tile_data.X}_{tile_data.Y}";
         jobGO.transform.position = new Vector3(tile_data.X, tile_data.Y, 0);
         jobGO.transform.SetParent(transform);
+        
+        //FIXME: this is hardcoded for doors, but it should not be eventually
+        //      Plus it doesn't update at runtime
+        if (_job.jobType == "door")
+        {
+            //If door is placed between north and south walls, rotate it 90 degrees.
+            //Doors in the model space do not care about their orientation/rotation
+            //It's only a visual thing
+
+            Tile tile_North = _job.tile.world.GetTileAt(_job.tile.X, _job.tile.Y + 1);
+            Tile tile_South = _job.tile.world.GetTileAt(_job.tile.X, _job.tile.Y - 1);
+            if ((tile_North != null && tile_South != null)
+                && (tile_North.furniture != null && tile_South.furniture != null)
+                && (tile_North.furniture.objectType == "wall" && tile_South.furniture.objectType == "wall"))
+            {
+                jobGO.transform.rotation *= Quaternion.AngleAxis(90, Vector3.forward);
+            }
+        }
         
         SpriteRenderer furn_sr = jobGO.AddComponent<SpriteRenderer>();
         furn_sr.sortingLayerName = JOB_SORTING_LAYER_NAME;

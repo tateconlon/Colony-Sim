@@ -62,7 +62,7 @@ public static class SimplePool
 		GameObject prefab;
 
 		// Keep the hierarchy clean
-		private GameObject parent;
+		GameObject parent;
 
 		// Constructor
 		public Pool(GameObject prefab, int initialQty)
@@ -110,9 +110,16 @@ public static class SimplePool
 				}
 			}
 
+			if (parent == null)
+			{	//Parent GameObject will disappear on scene reload, but keep the prefabs pool statically
+				//so we need to check if the parent is null
+				parent = new GameObject($"{prefab.name}_pool");
+			}
+			
 			obj.transform.position = pos;
 			obj.transform.rotation = rot;
 			obj.transform.SetParent(parent.transform);
+
 			obj.SetActive(true);
 			return obj;
 

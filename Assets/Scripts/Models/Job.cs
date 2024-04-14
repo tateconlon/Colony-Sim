@@ -17,7 +17,7 @@
      public Action<Job> OnJobCancelled;
      public Action<Job> OnJobAbandoned; //Use Scriptable objects?
 
-     public Job(Tile tile, Action<Job> onJobCompleted, string jobType, float jobTime = 1f)
+     public Job(Tile tile, Action<Job> onJobCompleted, string jobType, float jobTime = 0.5f)
      {
          this.tile = tile;
          this.onJobCompleted += onJobCompleted;

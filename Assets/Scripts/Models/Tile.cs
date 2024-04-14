@@ -1,7 +1,11 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Xml;
+using System.Xml.Schema;
+using System.Xml.Serialization;
 using UnityEngine;
+using Furniture_1 = Furniture;
 
 
 public enum TileType
@@ -11,8 +15,14 @@ public enum TileType
     UNINITIALIZED,
 }
 
+public enum Enterability
+{
+    Yes,
+    Never,
+    Soon,
+}
 
-public class Tile
+public class Tile : IXmlSerializable
 {
     public event Action<Tile> OnTileTypeChanged;    //Anytime our data changes
 
@@ -28,15 +38,17 @@ public class Tile
     }
 
     private Inventory _inventory;
-    public Furniture Furniture { get; protected set; }
+    public Furniture furniture { get; protected set; }
     public Job pendingFurnitureJob;
+
+    const float baseTileMovementCost = 1f;
 
     public float movementCost {
         get
         {
             if (_tileType == TileType.Empty) return 0;//impassable
-            if (Furniture == null) return 1;
-            return 1 * Furniture.movementCost;
+            if (furniture == null) return 1;
+            return baseTileMovementCost * furniture.movementCost;
         }
     }
 
@@ -47,29 +59,52 @@ public class Tile
 
     public Tile(World world, int x, int y)
     {
+        Init_Tile(world, x, y);
+    }
+    
+    public void Init_Tile(World world, int x, int y, TileType tType = TileType.UNINITIALIZED)
+    {
         this.world = world;
         this.X = x;
         this.Y = y;
-        TileType = TileType.UNINITIALIZED;
+        TileType = tType;
     }
 
+    /// <summary>
+    /// Returns true if you can enter this tile in this momemnt
+    /// </summary>
+    /// <returns></returns>
+    public Enterability IsEnterable()
+    {
+        if (movementCost == 0)
+        {
+            return Enterability.Never;
+        }
+
+        if (furniture != null && furniture.IsEnterable != null)
+        {
+            return furniture.IsEnterable(furniture);
+        } 
+
+        return Enterability.Yes;
+    }
     public bool TryAssignFurniture(Furniture objInstance)
     {
         if (objInstance == null)
         {
             //Remove Installed Object
-            Furniture = null;
+            furniture = null;
             OnTileTypeChanged?.Invoke(this);
             return true;
         }
 
-        if (Furniture != null)
+        if (furniture != null)
         {
-            Debug.LogError($"Tried to Install Object {objInstance} on tile {X},{Y} that already has an {Furniture} on it!");
+            Debug.LogError($"Tried to Install Object {objInstance} on tile {X},{Y} that already has an {furniture} on it!");
             return false;
         }
 
-        Furniture = objInstance;
+        furniture = objInstance;
         return true;
     }
 
@@ -102,4 +137,38 @@ public class Tile
 
         return retVal;
     }
+
+    #region SAVE_AND_LOAD
+
+    public XmlSchema GetSchema()
+    {
+        return null;
+    }
+
+    public void ReadXml(XmlReader reader)
+    {
+        reader.MoveToAttribute("Type");
+        _tileType = (TileType)reader.ReadContentAsInt();
+        OnTileTypeChanged?.Invoke(this);
+        
+        // We don't init the tile because it's already been given it's world + x & y coordinate
+        // During the World's init. SO WE DON'T DO THIS!
+        // reader.MoveToAttribute("X");
+        // int x = reader.ReadContentAsInt();
+        //
+        // reader.MoveToAttribute("Y");
+        // int y = reader.ReadContentAsInt();
+        // Init_Tile(null, x, y, tileType);
+    }
+
+    public void WriteXml(XmlWriter writer)
+    {
+        //Debug.Log("Tile::WriteXML");
+        
+        writer.WriteAttributeString("X", X.ToString());
+        writer.WriteAttributeString("Y", Y.ToString());
+        writer.WriteAttributeString("Type", ((int)_tileType).ToString());
+    }
+    
+    #endregion
 }

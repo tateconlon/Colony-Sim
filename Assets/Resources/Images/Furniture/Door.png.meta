@@ -34,7 +34,7 @@ TextureImporter:
   maxTextureSize: 2048
   textureSettings:
     serializedVersion: 2
-    filterMode: 1
+    filterMode: 0
     aniso: 1
     mipBias: 0
     wrapU: 1
@@ -43,12 +43,12 @@ TextureImporter:
   nPOTScale: 0
   lightmap: 0
   compressionQuality: 50
-  spriteMode: 1
+  spriteMode: 2
   spriteExtrude: 1
   spriteMeshType: 1
   alignment: 0
   spritePivot: {x: 0.5, y: 0.5}
-  spritePixelsToUnits: 100
+  spritePixelsToUnits: 32
   spriteBorder: {x: 0, y: 0, z: 0, w: 0}
   spriteGenerateFallbackPhysicsShape: 1
   alphaUsage: 1
@@ -121,7 +121,112 @@ TextureImporter:
     forceMaximumCompressionQuality_BC6H_BC7: 0
   spriteSheet:
     serializedVersion: 2
-    sprites: []
+    sprites:
+    - serializedVersion: 2
+      name: door_openness_0
+      rect:
+        serializedVersion: 2
+        x: 32
+        y: 238
+        width: 32
+        height: 4
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 86abb833318d84b78a34879a2778598b
+      internalID: 2113251769
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: door_openness_1
+      rect:
+        serializedVersion: 2
+        x: 32
+        y: 206
+        width: 32
+        height: 4
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 4e579cde76d024e57bf320a7a3a34bc7
+      internalID: -263568678
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: door_2
+      rect:
+        serializedVersion: 2
+        x: 142
+        y: 192
+        width: 4
+        height: 32
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: f1da2a42bca794145b43c9517f4892ad
+      internalID: -322551650
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: door_openness_2
+      rect:
+        serializedVersion: 2
+        x: 32
+        y: 174
+        width: 32
+        height: 4
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 42df591ce1da745d4abf1eb5062416d8
+      internalID: -36324402
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: door_openness_3
+      rect:
+        serializedVersion: 2
+        x: 32
+        y: 142
+        width: 32
+        height: 4
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: ed831783028994f6e858f676ed9f5718
+      internalID: -1229568258
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
     outline: []
     physicsShape: []
     bones: []
@@ -132,7 +237,91 @@ TextureImporter:
     edges: []
     weights: []
     secondaryTextures: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      Door_10: -972663860
+      Door_11: 1702212896
+      Door_12: -1206558050
+      Door_13: -1316323293
+      Door_14: 1916071556
+      Door_15: -1003026104
+      Door_16: -769674182
+      Door_17: -1166504712
+      Door_18: 394772079
+      Door_19: 931537089
+      Door_20: 2136566222
+      Door_21: 641529926
+      Door_22: -998843626
+      Door_23: 1661239975
+      Door_24: 1005739495
+      Door_25: -1081810802
+      Door_26: -647928404
+      Door_27: -1104960271
+      Door_28: -1587174886
+      Door_29: 975609255
+      Door_30: -1581872909
+      Door_31: -84819435
+      Door_32: -545876732
+      Door_33: 235388068
+      Door_34: -557463592
+      Door_35: 125562265
+      Door_36: -1648916200
+      Door_37: -732418177
+      Door_38: -728567954
+      Door_39: 2192736
+      Door_4: -1968336843
+      Door_40: -468233993
+      Door_41: -3977971
+      Door_42: 1351766948
+      Door_43: 1340707731
+      Door_44: 544398641
+      Door_45: 987688173
+      Door_46: 1419991641
+      Door_47: 738883567
+      Door_48: -734614355
+      Door_49: -1358509070
+      Door_5: -247007845
+      Door_50: 308131034
+      Door_51: -1077915119
+      Door_52: 81480892
+      Door_53: 876100294
+      Door_54: -1190153599
+      Door_55: 1846266715
+      Door_56: -1371389553
+      Door_57: -173899980
+      Door_58: -1213956130
+      Door_59: 660383511
+      Door_6: 613256511
+      Door_60: -57705608
+      Door_61: 482084096
+      Door_62: 1517819624
+      Door_63: -603951179
+      Door_64: 328640592
+      Door_65: -354173836
+      Door_66: -418700703
+      Door_67: -1742531406
+      Door_68: 246410870
+      Door_69: 217206705
+      Door_7: -1076429706
+      Door_70: -1535375921
+      Door_71: 40517707
+      Door_72: 163480660
+      Door_73: -2089793714
+      Door_74: -1792387277
+      Door_75: -1539378571
+      Door_76: -1362281653
+      Door_77: 211109026
+      Door_78: -603343263
+      Door_79: -1773814285
+      Door_8: -1684137358
+      Door_80: -683653478
+      Door_81: -223026189
+      Door_83: 43885674
+      Door_9: -1643487606
+      door_2: -1229568258
+      door_openness_0: 2113251769
+      door_openness_1: -263568678
+      door_openness_2: -36324402
+      door_openness_3: -1229568258
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

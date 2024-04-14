@@ -1,0 +1,147 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<World Width="100" Height="100">
+  <Tiles>
+    <Tile X="45" Y="45" Type="1" />
+    <Tile X="45" Y="46" Type="1" />
+    <Tile X="45" Y="47" Type="1" />
+    <Tile X="45" Y="48" Type="1" />
+    <Tile X="45" Y="49" Type="1" />
+    <Tile X="45" Y="50" Type="1" />
+    <Tile X="45" Y="51" Type="1" />
+    <Tile X="45" Y="52" Type="1" />
+    <Tile X="45" Y="53" Type="1" />
+    <Tile X="46" Y="45" Type="1" />
+    <Tile X="46" Y="46" Type="1" />
+    <Tile X="46" Y="47" Type="1" />
+    <Tile X="46" Y="48" Type="1" />
+    <Tile X="46" Y="49" Type="1" />
+    <Tile X="46" Y="50" Type="1" />
+    <Tile X="46" Y="51" Type="1" />
+    <Tile X="46" Y="52" Type="1" />
+    <Tile X="46" Y="53" Type="1" />
+    <Tile X="47" Y="45" Type="1" />
+    <Tile X="47" Y="46" Type="1" />
+    <Tile X="47" Y="47" Type="1" />
+    <Tile X="47" Y="48" Type="1" />
+    <Tile X="47" Y="49" Type="1" />
+    <Tile X="47" Y="50" Type="1" />
+    <Tile X="47" Y="51" Type="1" />
+    <Tile X="47" Y="52" Type="1" />
+    <Tile X="47" Y="53" Type="1" />
+    <Tile X="48" Y="45" Type="1" />
+    <Tile X="48" Y="46" Type="1" />
+    <Tile X="48" Y="47" Type="1" />
+    <Tile X="48" Y="48" Type="1" />
+    <Tile X="48" Y="49" Type="1" />
+    <Tile X="48" Y="50" Type="1" />
+    <Tile X="48" Y="51" Type="1" />
+    <Tile X="48" Y="52" Type="1" />
+    <Tile X="48" Y="53" Type="1" />
+    <Tile X="49" Y="45" Type="1" />
+    <Tile X="49" Y="46" Type="1" />
+    <Tile X="49" Y="47" Type="1" />
+    <Tile X="49" Y="48" Type="1" />
+    <Tile X="49" Y="49" Type="1" />
+    <Tile X="49" Y="50" Type="1" />
+    <Tile X="49" Y="51" Type="1" />
+    <Tile X="49" Y="52" Type="1" />
+    <Tile X="49" Y="53" Type="1" />
+    <Tile X="50" Y="45" Type="1" />
+    <Tile X="50" Y="46" Type="1" />
+    <Tile X="50" Y="47" Type="1" />
+    <Tile X="50" Y="48" Type="1" />
+    <Tile X="50" Y="49" Type="1" />
+    <Tile X="50" Y="50" Type="1" />
+    <Tile X="50" Y="51" Type="1" />
+    <Tile X="50" Y="52" Type="1" />
+    <Tile X="50" Y="53" Type="1" />
+    <Tile X="51" Y="45" Type="1" />
+    <Tile X="51" Y="46" Type="1" />
+    <Tile X="51" Y="47" Type="1" />
+    <Tile X="51" Y="48" Type="1" />
+    <Tile X="51" Y="49" Type="1" />
+    <Tile X="51" Y="50" Type="1" />
+    <Tile X="51" Y="51" Type="1" />
+    <Tile X="51" Y="52" Type="1" />
+    <Tile X="51" Y="53" Type="1" />
+    <Tile X="52" Y="45" Type="1" />
+    <Tile X="52" Y="46" Type="1" />
+    <Tile X="52" Y="47" Type="1" />
+    <Tile X="52" Y="48" Type="1" />
+    <Tile X="52" Y="49" Type="1" />
+    <Tile X="52" Y="50" Type="1" />
+    <Tile X="52" Y="51" Type="1" />
+    <Tile X="52" Y="52" Type="1" />
+    <Tile X="52" Y="53" Type="1" />
+    <Tile X="53" Y="45" Type="1" />
+    <Tile X="53" Y="46" Type="1" />
+    <Tile X="53" Y="47" Type="1" />
+    <Tile X="53" Y="48" Type="1" />
+    <Tile X="53" Y="49" Type="1" />
+    <Tile X="53" Y="50" Type="1" />
+    <Tile X="53" Y="51" Type="1" />
+    <Tile X="53" Y="52" Type="1" />
+    <Tile X="53" Y="53" Type="1" />
+    <Tile X="54" Y="45" Type="1" />
+    <Tile X="54" Y="46" Type="1" />
+    <Tile X="54" Y="47" Type="1" />
+    <Tile X="54" Y="48" Type="1" />
+    <Tile X="54" Y="49" Type="1" />
+    <Tile X="54" Y="50" Type="1" />
+    <Tile X="54" Y="51" Type="1" />
+    <Tile X="54" Y="52" Type="1" />
+    <Tile X="54" Y="53" Type="1" />
+  </Tiles>
+  <Furnitures>
+    <Furniture X="45" Y="48" objectType="wall" />
+    <Furniture X="45" Y="49" objectType="wall" />
+    <Furniture X="54" Y="48" objectType="wall" />
+    <Furniture X="54" Y="49" objectType="wall" />
+    <Furniture X="46" Y="49" objectType="door">
+      <Param name="openness" value="0" />
+      <Param name="is_opening" value="0" />
+    </Furniture>
+    <Furniture X="47" Y="49" objectType="door">
+      <Param name="openness" value="0" />
+      <Param name="is_opening" value="0" />
+    </Furniture>
+    <Furniture X="48" Y="49" objectType="door">
+      <Param name="openness" value="0" />
+      <Param name="is_opening" value="0" />
+    </Furniture>
+    <Furniture X="49" Y="49" objectType="door">
+      <Param name="openness" value="0" />
+      <Param name="is_opening" value="0" />
+    </Furniture>
+    <Furniture X="50" Y="49" objectType="door">
+      <Param name="openness" value="0" />
+      <Param name="is_opening" value="0" />
+    </Furniture>
+    <Furniture X="51" Y="49" objectType="door">
+      <Param name="openness" value="0" />
+      <Param name="is_opening" value="0" />
+    </Furniture>
+    <Furniture X="52" Y="49" objectType="door">
+      <Param name="openness" value="0" />
+      <Param name="is_opening" value="0" />
+    </Furniture>
+    <Furniture X="53" Y="49" objectType="door">
+      <Param name="openness" value="0" />
+      <Param name="is_opening" value="0" />
+    </Furniture>
+    <Furniture X="49" Y="50" objectType="door">
+      <Param name="openness" value="0" />
+      <Param name="is_opening" value="0" />
+    </Furniture>
+    <Furniture X="49" Y="47" objectType="door">
+      <Param name="openness" value="0" />
+      <Param name="is_opening" value="0" />
+    </Furniture>
+    <Furniture X="52" Y="50" objectType="wall" />
+    <Furniture X="52" Y="48" objectType="wall" />
+    <Furniture X="47" Y="48" objectType="wall" />
+  </Furnitures>
+  <Characters>
+    <Character X="47" Y="48" />
+  </Characters>
+</World>

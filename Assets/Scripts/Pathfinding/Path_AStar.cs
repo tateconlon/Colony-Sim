@@ -72,12 +72,12 @@ public class Path_AStar
                 {
                     continue;
                 }
-
-                //the neighbour came from the current. this has been the neighbors lowest g_score
-                came_from[nNode] = curr;    
                 
                 //Update the lowest g_score
                 g_scores[nNode] = tentative_g_score;
+
+                //the neighbour came from the current. this has been the neighbors lowest g_score
+                came_from[nNode] = curr;    
                 
                 //f_score (guessed score) is now re-guessed using the new g_score
                 float f_score= tentative_g_score + CalculateFScore(nNode, map[goal]);
