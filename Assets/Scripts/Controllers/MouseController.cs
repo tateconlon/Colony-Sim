@@ -9,17 +9,27 @@ using UnityEngine.EventSystems;
 
 public class MouseController : MonoBehaviour
 {
+    public static MouseController Instance;
     [SerializeField] GameObject selectionCursorPrefab;
     [SerializeField] float zoomSpeed = 0.2f;
     
-    private Vector3 currFramePos;
-    private Vector3 lastFramePos;
+    Vector3 currFramePos;
+    Vector3 lastFramePos;
     
-    private Vector3 dragStartPos;
+    Vector3 dragStartPos;
 
-    private bool isBuildModeObjects = false;
-    private TileType buildModeTile = TileType.Floor;
-    private string buildMode_FurnitureType = "";
+    bool isBuildModeObjects = false;
+    TileType buildModeTile = TileType.Floor;
+    string buildMode_FurnitureType = "";
+
+    public void Awake()
+    {
+        if (Instance != null)
+        {
+            Debug.LogError("Two MouseControllers present in Scene!");
+        }
+        Instance = this;
+    }
 
     public void Start()
     {
@@ -108,7 +118,7 @@ public class MouseController : MonoBehaviour
             Vector3 dragEndPos = currFramePos;
 
             List<Tile> tiles = dragPreviewGO.Keys.ToArray().ToList();
-            BuildModeController.Instance.DoWork(tiles.ToList());
+            BuildModeController.Instance.DoBuild(tiles.ToList());
 
             foreach (GameObject tile_GO in dragPreviewGO.Values)
             {
@@ -117,6 +127,17 @@ public class MouseController : MonoBehaviour
             
             dragPreviewGO.Clear();
         }
+    }
+
+    public Vector3 GetMousePosition()
+    {
+        return currFramePos;
+    }
+
+    public Tile GetTileUnderMouse()
+    {
+        Vector2Int tileCoords = WorldController.ScreenToTileCoord(currFramePos);
+        return WorldController.Instance.World.GetTileAt(tileCoords.x, tileCoords.y);
     }
 
     void UpdateCameraDrag_UPDATE()

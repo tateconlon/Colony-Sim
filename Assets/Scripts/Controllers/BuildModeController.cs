@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 public class BuildModeController : MonoBehaviour
 {
@@ -26,7 +27,7 @@ public class BuildModeController : MonoBehaviour
         }
         Instance = this;
     }
-    public void DoWork(List<Tile> tiles)
+    public void DoBuild(List<Tile> tiles)
     {
         foreach (Tile tile in tiles)
         {
@@ -36,14 +37,24 @@ public class BuildModeController : MonoBehaviour
 
                 if (WorldController.Instance.World.IsFurniturePlacementValid(furnitureType, tile))
                 {
-                    Job j = new Job(tile,
-                        (Job j) =>
-                        {
-                            WorldController.Instance.World.TryPlaceFurniture(furnitureType,
-                                tile);
-                        },
-                        furnitureType);
-                        
+                    
+                    Job j;
+                    if (WorldController.Instance.World.furnitureJobPrototypes.TryGetValue(furnitureType, out Job jobProto))
+                    {
+                        //success!
+                        j = jobProto.Clone();
+                        j.tile = tile;
+                    }
+                    else
+                    {
+                        Debug.LogError($"There is no Furniture Job Prototype for {furnitureType}");
+                        j = new Job(tile,
+                        FurnitureActions.JobComplete_FurnitureBuilding,
+                        furnitureType, 
+                        0.1f,
+                        null);
+                    }
+
                     //FIXME: I don't like having to manually and explicitly set flags to prevent conflicts
                     //It's too easy to forget to set/clear them
                     tile.pendingFurnitureJob = j;

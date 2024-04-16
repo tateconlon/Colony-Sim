@@ -50,14 +50,6 @@ public class FurnitureSpriteController : MonoBehaviour
         int y = Mathf.FloorToInt(coord.y + 0.5f);
         return new Vector2Int(x, y);
     }
-    
-    [CanBeNull]
-    public Tile GetTileAtWorldCoord(Vector3 coord)
-    {
-        Vector2Int tileCoords = ScreenToTileCoord(coord);
-
-        return WorldController.Instance.World.GetTileAt(tileCoords.x, tileCoords.y);
-    }
 
     public void OnFurnitureCreated(Furniture createdObj)
     {
@@ -104,19 +96,19 @@ public class FurnitureSpriteController : MonoBehaviour
         {
             if (furn.objectType == "door")
             {
-                if (furn.furnParams["openness"] < 0.1f)
+                if (furn.GetParameter("openness") < 0.1f)
                 {
                     spriteName = "door_openness_0";
                 }
-                else if (furn.furnParams["openness"] < 0.4f)
+                else if (furn.GetParameter("openness") < 0.4f)
                 {
                     spriteName = "door_openness_1";
                 }
-                else if (furn.furnParams["openness"] < 0.9f)
+                else if (furn.GetParameter("openness") < 0.9f)
                 {
                     spriteName = "door_openness_2";
                 }
-                else if (furn.furnParams["openness"] >= 0.9f)
+                else if (furn.GetParameter("openness") >= 0.9f)
                 {
                     spriteName = "door_openness_3";
                 }

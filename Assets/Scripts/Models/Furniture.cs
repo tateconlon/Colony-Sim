@@ -2,6 +2,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Xml;
 using System.Xml.Schema;
 using System.Xml.Serialization;
@@ -9,7 +10,7 @@ using UnityEngine;
 
 public class Furniture : IXmlSerializable
 {
-    public Dictionary<string, float> furnParams = new();
+    protected Dictionary<string, float> furnParams = new();
     public Action<Furniture, float> updateActions;
     public Func<Furniture, Enterability> IsEnterable;
 
@@ -23,6 +24,8 @@ public class Furniture : IXmlSerializable
     //Movement speed is 1/movementCost.
     //SPECIAL: 0 -> can't walk through it
     public float movementCost { get; protected set; }
+
+    public bool roomEnclosure; //Does this help define the border of a room? ex: Wall, door, window
 
     int width;
     int height;
@@ -43,8 +46,8 @@ public class Furniture : IXmlSerializable
         this.width = other.width;
         this.height = other.height;
         this.linksToNeighbours = other.linksToNeighbours;
+        this.roomEnclosure = other.roomEnclosure;
 
-        
         this.furnParams = new Dictionary<string, float>(other.furnParams);
         if (other.updateActions != null)
         {
@@ -71,13 +74,14 @@ public class Furniture : IXmlSerializable
     //TODO: Implement rotation
     
     // This should only be used to make prototypes. Create furnitures via PlaceInstance.
-    public Furniture(string objectType, float movementCost = 1f, int width = 1, int height = 1, bool linksToNeighbours = false)
+    public Furniture(string objectType, float movementCost = 1f, int width = 1, int height = 1, bool linksToNeighbours = false, bool roomEnclosure = false)
     {
         this.objectType = objectType;
         this.movementCost = movementCost;
         this.width = width;
         this.height = height;
         this.linksToNeighbours = linksToNeighbours;
+        this.roomEnclosure = roomEnclosure;
         this.funcPositionValidation = __IsValidPosition;   //Move these validation functions into static librariy
 
         furnParams = new();
@@ -142,6 +146,32 @@ public class Furniture : IXmlSerializable
     public void Update(float deltaTime)
     {
         updateActions?.Invoke(this, deltaTime);
+    }
+
+    public float GetParameter(string key, float defaultVal = 0)
+    {
+        if (furnParams.TryGetValue(key, out float retVal))
+        {
+            return retVal;
+        }
+
+        return defaultVal;
+    }
+
+    public void SetParameter(string key, float value)
+    {
+        furnParams["key"] = value;
+    }
+    
+    public void ChangeParameter(string key, float value)
+    {
+        if (furnParams.ContainsKey("key"))
+        {
+            furnParams["key"] += value;
+            return;
+        }
+
+        furnParams["key"] = value;
     }
 
     //TODO: Move these into static position library

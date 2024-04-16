@@ -7,7 +7,6 @@ using Priority_Queue;
 public class Path_AStar
 {
     Stack<Tile> path;
-
     
     //g_score is the current REAL distance from start to node
     //f_score is the GUESSED distance. f_score = current_g_score + guessed_distance(here, goal)

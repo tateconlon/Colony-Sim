@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Xml;
 using System.Xml.Schema;
 using System.Xml.Serialization;
+using Unity.VisualScripting;
 using UnityEngine;
 using Furniture_1 = Furniture;
 
@@ -37,7 +38,9 @@ public class Tile : IXmlSerializable
             if(oldType != _tileType) OnTileTypeChanged?.Invoke(this);}
     }
 
-    private Inventory _inventory;
+    public Room room { get; set; }
+
+    public Inventory _inventory { get; protected set; }
     public Furniture furniture { get; protected set; }
     public Job pendingFurnitureJob;
 
@@ -100,11 +103,58 @@ public class Tile : IXmlSerializable
 
         if (furniture != null)
         {
-            Debug.LogError($"Tried to Install Object {objInstance} on tile {X},{Y} that already has an {furniture} on it!");
+            Debug.LogError($"Tried to Install Furniture {objInstance.objectType} on tile {X},{Y} that already has an {furniture.objectType} on it!");
             return false;
         }
 
         furniture = objInstance;
+        return true;
+    }
+    
+    public bool TryAssignInventory(Inventory inv)
+    {
+        if (inv == null)
+        {
+            //Remove Installed Object
+            _inventory = null;
+            OnTileTypeChanged?.Invoke(this);
+            return true;
+        }
+
+        if (_inventory != null)
+        {
+            if (_inventory.objectType != inv.objectType)
+            {
+                Debug.LogError($"Tried to Install Inventory {inv.objectType} on tile {X},{Y} that already has an {_inventory.objectType} on it!");
+                return false;
+            } 
+            // else if (_inventory.stackSize + inv.stackSize > inv.maxStackSize)
+            // {
+            //     Debug.LogError($"Tried to Install Inventory that exceeds max size! {_inventory.objectType}: {_inventory.stackSize} + {inv.stackSize} > {inv.stackSize} on tile {X},{Y}");
+            //     return false;
+            // }
+
+            int numToMove = inv.stackSize;
+            if (_inventory.stackSize + numToMove > _inventory.maxStackSize)
+            {   //We'll only add the amount that makes us reach the max stack size
+                numToMove = _inventory.maxStackSize - _inventory.stackSize;
+            }
+
+            _inventory.stackSize += numToMove;
+            inv.stackSize -= numToMove;
+            
+            return true;
+        }
+
+        //_inventory is null. Can't just directly assign it because
+        //Inventory manager needs to know it was created.
+        _inventory = inv;//.Clone();
+        _inventory.tile = this;
+        _inventory.CallOnChanged(); 
+        
+        //We do this as a type of "return value" in InventoryManager.PlaceInventory.
+        //We check if inv.stackSize == 0, then remove it.
+        //inv.stackSize = 0;  
         return true;
     }
 

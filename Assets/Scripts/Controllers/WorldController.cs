@@ -42,14 +42,6 @@ public class WorldController : MonoBehaviour
         //     j.DoWork(Time.deltaTime);
         // }
     }
-    
-    [CanBeNull]
-    public Tile GetTileAtWorldCoord(Vector3 coord)
-    {
-        Vector2Int tileCoords = ScreenToTileCoord(coord);
-
-        return WorldController.Instance.World.GetTileAt(tileCoords.x, tileCoords.y);
-    }
 
 
     public static Vector2Int ScreenToTileCoord(Vector3 coord)
