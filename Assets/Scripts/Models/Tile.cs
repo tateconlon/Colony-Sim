@@ -148,9 +148,9 @@ public class Tile : IXmlSerializable
 
         //_inventory is null. Can't just directly assign it because
         //Inventory manager needs to know it was created.
-        _inventory = inv;//.Clone();
+        _inventory = inv.Clone();
         _inventory.tile = this;
-        _inventory.CallOnChanged(); 
+        _inventory.CallOnChanged(); //Should this be OnCreated???
         
         //We do this as a type of "return value" in InventoryManager.PlaceInventory.
         //We check if inv.stackSize == 0, then remove it.

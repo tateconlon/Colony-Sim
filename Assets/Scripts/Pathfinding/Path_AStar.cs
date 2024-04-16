@@ -125,6 +125,16 @@ public class Path_AStar
         return success ? t : null;
     }
 
+    public Tile Peek()
+    {
+        if (path != null && path.TryPeek(out Tile tile))
+        {
+            return tile;
+        }
+
+        return null;
+    }
+
     float CalculateFScore(Path_Node<Tile> curr, Path_Node<Tile> dest)
     {
         return Vector2.Distance(curr.data.Pos, dest.data.Pos);

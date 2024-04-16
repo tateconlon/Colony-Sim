@@ -1,3 +1,4 @@
+using System;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -16,10 +17,12 @@ public class MouseOverRoomIndex : MonoBehaviour
     void Update()
     {
         Tile t = MouseController.Instance.GetTileUnderMouse();
-        if (t == null || t.world == null)
+        if (t == null || t.world == null || t.room == null)
         {
             myText.text = $"Room Index: N/A";
+            return;
         }
+        
         myText.text = $"Room Index: {t.world.rooms.IndexOf(t.room).ToString()}";
     }
 }

@@ -19,6 +19,7 @@ public class MouseOverTileTypeText : MonoBehaviour
         if (t == null)
         {
             myText.text = $"TileType: N/A";
+            return;
         }
         myText.text = $"TileType: {t.TileType.ToString()}";
     }

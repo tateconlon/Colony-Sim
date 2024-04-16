@@ -59,7 +59,7 @@ public class JobSpriteController : MonoBehaviour
         job_GameObject_Map.TryAdd(_job, jobGO);
 
 
-        _job.onJobCompleted += OnJobEnded;
+        _job.OnJobCompleted += OnJobEnded;
         _job.OnJobCancelled += OnJobEnded;
     }
 
@@ -70,7 +70,7 @@ public class JobSpriteController : MonoBehaviour
             Destroy(go);
             job_GameObject_Map.Remove(_job);
             
-            _job.onJobCompleted -= OnJobEnded;
+            _job.OnJobCompleted -= OnJobEnded;
             _job.OnJobCancelled -= OnJobEnded;
             
             return;

@@ -29,7 +29,8 @@ public class InventorySpriteController : MonoBehaviour
             }
         }
 
-        _world.OnInventoryCreated += OnInventoryCreated;
+        _world.inventoryManager.OnInventoryCreated += OnInventoryCreated;
+        _world.inventoryManager.OnInventoryDeleted += OnInventoryDeleted;
     }
     
     void LoadSprites()
@@ -48,7 +49,7 @@ public class InventorySpriteController : MonoBehaviour
     {
         if (inventory_GameObject_Map.ContainsKey(inv))
         {
-            Debug.LogError($"Trying to create character {inv}, but it already exists!");
+            Debug.LogError($"Trying to create inventory {inv}, but it already exists!");
             return;
         }
 
@@ -71,6 +72,19 @@ public class InventorySpriteController : MonoBehaviour
         
         inventory_GameObject_Map.Add(inv, inv_go);
         inv.OnChanged += OnInventoryChanged;
+    }
+    
+    //Create visuals GameObject
+    void OnInventoryDeleted(Inventory inv)
+    {
+        if (!inventory_GameObject_Map.ContainsKey(inv))
+        {
+            Debug.LogError($"Trying to destroy inventory {inv}, but it already exists!");
+            return;
+        }
+
+        Destroy(inventory_GameObject_Map[inv]);
+        inv.OnChanged -= OnInventoryChanged;
     }
     
     

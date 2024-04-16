@@ -8,7 +8,20 @@ public class Inventory
 {
     public string objectType;
     public int maxStackSize = 0;
-    public int stackSize = 0;
+    public int _stackSize = 0;
+    public int stackSize
+    {
+        get { return _stackSize; }
+        set
+        {
+            if (_stackSize != value)
+            {
+                _stackSize = value;
+                OnChanged?.Invoke(this);
+            }
+        }
+    }
+    public int UnfilledStackSize => maxStackSize - stackSize;
 
     public Tile tile;
     public Character character;
@@ -19,7 +32,17 @@ public class Inventory
     {
         objectType = other.objectType;
         maxStackSize = other.maxStackSize;
-        stackSize = other.stackSize;
+        _stackSize = other.stackSize;
+        tile = other.tile;
+
+        if (other.OnChanged != null)
+        {
+            foreach (Delegate del in other.OnChanged.GetInvocationList())
+            {
+                OnChanged += (Action<Inventory>)del;
+            }
+            //Do we want to call OnChanged here?
+        }
     }
     
     public Inventory(string objectType, int stackSize, int maxStackSize)

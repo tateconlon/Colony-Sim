@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Xml;
 using System.Xml.Schema;
 using System.Xml.Serialization;
@@ -13,14 +14,16 @@ public class Character : IXmlSerializable
     public Vector2 Pos => new Vector3(X, Y);
     
     Tile currTile;
+
+    Tile _destTile;
     Tile destTile
     {
-        get { return destTile;}
+        get { return _destTile;}
         set
         {
-            if (destTile != value)
+            if (_destTile != value)
             {
-                destTile = value;
+                _destTile = value;
                 pathing = null;
             }
         }
@@ -33,7 +36,7 @@ public class Character : IXmlSerializable
     Path_AStar pathing;
 
     //Item we're carrying, not a backpack or gear
-    Inventory inventory;
+    public Inventory inventory;
 
     public event Action<Character> OnChanged;
     
@@ -42,19 +45,6 @@ public class Character : IXmlSerializable
         currTile = destTile = nextTile = t;
         this.moveSpeed = moveSpeed;
     }
-
-    void AbandonJob()
-    {
-        if (myJob == null) return;
-        
-        myJob.CancelJob();
-
-        myJob.OnJobCancelled -= OnJobEnded;
-        myJob.onJobCompleted -= OnJobEnded;
-
-        myJob = null;
-    }
-
 
     void Update_DoJob2(float deltaTime)
     {
@@ -77,7 +67,7 @@ public class Character : IXmlSerializable
             // Walk to the job tile, then drop off the stack into the job
             if (inventory != null)
             {
-                if (myJob.DesiresInventoryType(inventory))
+                if (myJob.DesiresInventoryType(inventory, out Inventory recipeInventory))
                 {   //We are holding the right inventory
                     if (currTile == myJob.tile)
                     {
@@ -138,10 +128,47 @@ public class Character : IXmlSerializable
             {
                 //Job doesn't have all materials, and we aren't carrying anything
                 //Walk towards a tile containing the required goods
-                //If already on such a tile, pick up the goods.
                 
-                //FIXME: This is a dumb/simple/unoptimal initial setup
-                //Grab the first from the inventory manager
+                //STEP 1: 
+                //If already on a tile with resources the job needs, pick up the required inventory & amount.
+                if (currTile._inventory != null && myJob.DesiresInventoryType(currTile._inventory, out Inventory recipeInv))
+                {
+                    currTile.world.inventoryManager.PlaceInventory(this, currTile._inventory, recipeInv.UnfilledStackSize);
+                }
+                else
+                {
+                    //Step 2: Walk towards a tile with the goods
+                    //FIXME: This is a dumb/simple/unoptimal initial setup
+                    //Grab the first from the inventory manager
+
+                    Inventory desired = null;
+                    List<Inventory> desiredInventories = myJob.GetDesiredInventories();
+                    if (desiredInventories.Count > 0)
+                    {
+                        desired = desiredInventories[0];
+                    }
+                    else
+                    {
+                        Debug.LogError("Job doesn't have all materials, but has no desired Inventories.");
+                    }
+
+                    Inventory supplier = currTile.world.inventoryManager.GetClosestInventoryOfType
+                        (desired.objectType, currTile, desired.UnfilledStackSize);
+
+                    if (supplier == null)
+                    {
+                        Debug.Log($"No tile contains objects of {desired.objectType} to satisfy {myJob.jobType}");
+                    
+                        AbandonJob();
+                        destTile = currTile; //IF SOMETHING DOESN'T WORK!!! Should this be in Abandon Job? Should this be here?
+                        return;
+                    }
+
+                    Debug.Log($"Getting {desired.objectType} supplies");
+                    destTile = supplier.tile;
+                    //nextTile = null;
+                    return;
+                }
             }
             
             return;  // We can't continue until all materials are satisfied
@@ -198,9 +225,18 @@ public class Character : IXmlSerializable
         myJob = j;
             
         myJob.OnJobCancelled += OnJobEnded;
-        myJob.onJobCompleted += OnJobEnded;
+        myJob.OnJobCompleted += OnJobEnded;
         return true;
     }
+    
+    void AbandonJob()
+    {
+        Debug.Log("Abandoning Job");
+        if (myJob == null) return;
+        
+        myJob.CancelJob();
+    }
+
     
     public void Update(float deltaTime)
     {
@@ -220,7 +256,7 @@ public class Character : IXmlSerializable
                     nextTile = currTile;
                 }
             }
-            else
+            else if(currTile == nextTile)
             {   //pathing existed
                 nextTile = pathing.DequeueNextTile();
             }
@@ -278,7 +314,7 @@ public class Character : IXmlSerializable
         Path_AStar p = new Path_AStar(currTile.world, currTile, destTile);
         if (p.Length() == 0)
         {
-            Debug.LogError($"Character::TrySetDestination: {this} cannot get from {currTile} to {this.destTile}. Setting destination tile to current tile.");
+            Debug.LogError($"Character::TrySetDestination: {this} cannot get from {currTile.Pos} to {destTile.Pos}. Setting destination tile to current tile.");
             this.destTile = currTile;
             pathing = null;
             return false;
@@ -321,9 +357,63 @@ public class Character : IXmlSerializable
         }
         
         myJob.OnJobCancelled -= OnJobEnded;
-        myJob.onJobCompleted -= OnJobEnded;
+        myJob.OnJobCompleted -= OnJobEnded;
 
         myJob = null;
+    }
+    
+    public bool TryAssignInventory(Inventory inv, int desiredAmount)
+    {
+        if (inv == null)
+        {
+            //Remove Installed Object
+            inventory = null;
+            //OnTileTypeChanged?.Invoke(this); From tile code
+            return true;
+        }
+
+        if (inventory != null && inventory.objectType != inv.objectType)
+        {
+            Debug.LogError($"Tried to Install Inventory {inv.objectType} on tile {X},{Y} that already has an {inventory.objectType} on it!");
+            return false;
+        }
+
+        inventory = inv.Clone(); //This will cause errors when this is the recipe's maxStackSize! It will be too low and not match the prototype's actual stack size
+        inventory.tile = null;
+        inventory.stackSize = 0; //Our inventory is the same type, but it's of type 0;
+        
+        int numToMove = Mathf.Clamp(desiredAmount, 0, inv.stackSize);   //we move amount, capped by stacksize
+            if (inventory.stackSize + numToMove > inventory.maxStackSize)
+            {   //We'll only add the amount that makes us reach the max stack size
+                numToMove = inventory.maxStackSize - inventory.stackSize;
+            }
+
+        inventory.stackSize += numToMove;
+        inv.stackSize -= numToMove;
+        //     
+        //     return true;
+        // }
+        //
+        // //THIS DOESN'T GIVE DESIRED BEHAVIOUR BECAUSE IT DOESN'T CHECK AMOUNT
+        // //AND SPLIT THE INVENTORY INTO 2
+        //
+        // //_inventory is null. Can't just directly assign it because
+        // //Inventory manager needs to know it was created.
+        // inventory = inv.Clone();
+        // //inventory.tile = this; From tile code
+        // if (inventory.tile != null)
+        // {
+        //     inventory.tile.TryAssignInventory(null);
+        // }
+        //
+        // inventory.tile = null;
+        // //inventory.CallOnChanged(); We don't call events on non-floor inventories
+        //
+        // //We do this as a type of "return value" in InventoryManager.PlaceInventory.
+        // //We check if inv.stackSize == 0, then remove it.
+        // //inv.stackSize = 0;  
+        // return true;
+        return true;
     }
 
     #region SAVING_AND_LOADING

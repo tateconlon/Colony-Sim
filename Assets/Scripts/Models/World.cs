@@ -24,8 +24,6 @@ public class World : IXmlSerializable
 
     public event Action<Furniture> OnFurnitureCreated;
     public event Action<Character> OnCharacterCreated;
-    public event Action<Inventory> OnInventoryCreated;
-    public event Action<Inventory> OnInventoryChanged;
     public event Action<Tile> OnTileChangedEvent;
 
     public JobQueue jobQueue;
@@ -326,20 +324,20 @@ public class World : IXmlSerializable
         }
         
         //DEBUG ONLY: remove me later
-        Inventory inventoryItem = new Inventory("steel_plate", 15, 50);
+        Inventory inventoryItem = new Inventory("steel_plate", 1, 50);
         Tile t = GetTileAt(51, 51);
         inventoryManager.PlaceInventory(t, inventoryItem);
-        OnInventoryCreated?.Invoke(t._inventory);
+        //OnInventoryCreated?.Invoke(t._inventory);
         
-        Inventory inventoryItem2 = new Inventory("steel_plate", 10, 50);
-        t = GetTileAt(50, 54);
+        Inventory inventoryItem2 = new Inventory("steel_plate", 2, 50);
+        t = GetTileAt(50, 53);
         inventoryManager.PlaceInventory(t, inventoryItem2);
-        OnInventoryCreated?.Invoke(t._inventory);
+        //OnInventoryCreated?.Invoke(t._inventory);
         
-        Inventory inventoryItem4 = new Inventory("steel_plate", 20, 50);
+        Inventory inventoryItem4 = new Inventory("steel_plate", 1, 50);
         t = GetTileAt(49, 51);
         inventoryManager.PlaceInventory(t, inventoryItem4);
-        OnInventoryCreated?.Invoke(t._inventory);
+        //OnInventoryCreated?.Invoke(t._inventory);
 
     }
 
