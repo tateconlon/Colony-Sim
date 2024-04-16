@@ -38,9 +38,4 @@ public class Inventory
     {
         OnChanged?.Invoke(this);
     }
-
-    public int GetEmptyStackSpace()
-    {
-        return maxStackSize - stackSize;
-    }
 }

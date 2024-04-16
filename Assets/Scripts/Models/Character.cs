@@ -58,6 +58,8 @@ public class Character : IXmlSerializable
 
     void Update_DoJob2(float deltaTime)
     {
+        //If no job, try and get one.
+        //If we can't get one, bail out.
         if (myJob == null)
         {
             if (TryGetNewJobFromQueue() == false) return;
@@ -76,16 +78,16 @@ public class Character : IXmlSerializable
             if (inventory != null)
             {
                 if (myJob.DesiresInventoryType(inventory))
-                {
+                {   //We are holding the right inventory
                     if (currTile == myJob.tile)
                     {
                         //We are at the job site.
-                        //Drop off
+                        //Drop off inventory into the job
                         currTile.world.inventoryManager.PlaceInventory(myJob, inventory);
-                        //Are we still carrying things?
-
+                        
+                        //Are we still carrying something
                         if (inventory.stackSize == 0)
-                        {
+                        {   //not carrying anything. It's already been removed from InventoryManager
                             inventory = null;
                         }
                         else
@@ -93,13 +95,25 @@ public class Character : IXmlSerializable
                             //This is not true, because MY version of the code allows for the inventory to still have a stack size > 0
                             //if you were holding too many supplies.
                             //We should be putting it on the ground (but we are on the job site
-                            Debug.LogError("Character is still carrying inventory, which shouldn't be. Just setting to NULL for now. Means we are LEAKING inventories");
+                            Debug.LogError("Character is still carrying inventory, which shouldn't be. " +
+                                           "Just setting to NULL for now. Means we are LEAKING inventories");
+                            
+                            //This inventory is still present in the inventory manager.
+                            //To do this naiive delete, we need to remove it from the inventory.
+                            myJob.tile.world.inventoryManager.inventories[inventory.objectType].Remove(inventory);
                             inventory = null;
                         }
+                        //end of being at the job tile
                     }
                     else
-                    {   //We still need to walk to the job site
+                    {   
+                        //We still need to walk to the job site
                         destTile = myJob.tile;
+                        //FIXME: we still need to do proper pathfinding
+                        //However, in the movement code will see that we have no pathing and then try to create pathing
+                        //to destTile - so this might not be broken. If it can't create pathing to destTile
+                        //It will change destTile to currTile
+                        //setting destTile invalidates pathfinding.
                         return;
                     }
                 }
@@ -108,15 +122,18 @@ public class Character : IXmlSerializable
                     //Dump the inventory at our feet (or nearest)
                     
                     //Walk to nearest empty tile and dump it
-                    if (currTile.world.inventoryManager.PlaceInventory(currTile, inventory))
+                    if (!currTile.world.inventoryManager.PlaceInventory(currTile, inventory))
                     {
                         Debug.LogError("Character tried to place inventory into an invalid tile, maybe there's something here");
                         //FIXME: for the sake of continuing on, we are going to set the inventory to null.
                         //This is not the right behaviour. We are leaking inventory
+                        
+                        //removing from inventorymanager prevents leaking, but the inventory still evaporates
+                        myJob.tile.world.inventoryManager.inventories[inventory.objectType].Remove(inventory);
                         inventory = null;
                     }
-                }
-            }
+                }   //End of dealing with our inventory
+            }//end of us having inventory
             else
             {
                 //Job doesn't have all materials, and we aren't carrying anything
@@ -133,8 +150,11 @@ public class Character : IXmlSerializable
         //Now job has all materials, make sure destination tile == job tile
         destTile = myJob.tile;
         
-        //We have all the material?
+        //Job has all the material
         //Have we arrived?
+        //myJob.tile check vs. destTile is okay because even if we have a destTile != myJob.tile
+        //(meaning we might walk across the jobsite when pathfinding to materials)
+        //We would've bailed earlier. But && currTile == destTile supplement might be safer.
         if (currTile == myJob.tile)    
         {
             //We have arrived at the job, so we execute
