@@ -52,7 +52,7 @@ public class Room
     
     public static void DoRoomFloodFill(Furniture sourceFurniture)
     {
-        DoRoomFloodFill(sourceFurniture.tileOwner);
+        DoRoomFloodFill(sourceFurniture.tile);
     }
     
     /// <summary>

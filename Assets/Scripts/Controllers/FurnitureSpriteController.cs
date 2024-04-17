@@ -54,7 +54,7 @@ public class FurnitureSpriteController : MonoBehaviour
     public void OnFurnitureCreated(Furniture createdObj)
     {
         //Do visuals
-        Tile tile_data = World.GetTileAt(createdObj.tileOwner.X, createdObj.tileOwner.Y);
+        Tile tile_data = World.GetTileAt(createdObj.tile.X, createdObj.tile.Y);
                 
         GameObject furn_go = new GameObject();
 
@@ -70,8 +70,8 @@ public class FurnitureSpriteController : MonoBehaviour
             //Doors in the model space do not care about their orientation/rotation
             //It's only a visual thing
 
-            Tile tile_North = World.GetTileAt(createdObj.tileOwner.X, createdObj.tileOwner.Y + 1);
-            Tile tile_South = World.GetTileAt(createdObj.tileOwner.X, createdObj.tileOwner.Y - 1);
+            Tile tile_North = World.GetTileAt(createdObj.tile.X, createdObj.tile.Y + 1);
+            Tile tile_South = World.GetTileAt(createdObj.tile.X, createdObj.tile.Y - 1);
             if ((tile_North != null && tile_South != null)
                 && (tile_North.furniture != null && tile_South.furniture != null)
                 && (tile_North.furniture.objectType == "wall" && tile_South.furniture.objectType == "wall"))
@@ -83,6 +83,7 @@ public class FurnitureSpriteController : MonoBehaviour
         SpriteRenderer furn_sr = furn_go.AddComponent<SpriteRenderer>();
         furn_sr.sortingLayerName = FURNITURE_SORTING_LAYER_NAME;
         furn_sr.sprite = GetSpriteForFurniture(createdObj);
+        furn_sr.color = createdObj.tint;
 
         furniture_GameObject_Map.TryAdd(createdObj, furn_go);
 
@@ -117,14 +118,14 @@ public class FurnitureSpriteController : MonoBehaviour
                 {
                     return doorSprite;
                 }
-                Debug.LogError($"Could not find sprite {spriteName} for door @ {furn.tileOwner.Pos}");
+                Debug.LogError($"Could not find sprite {spriteName} for door @ {furn.tile.Pos}");
             }
 
             return furnitureSprites[furn.objectType];
         }
 
         spriteName = furn.objectType + "_";
-        Tile t = furn.tileOwner;
+        Tile t = furn.tile;
         
         Tile temp_N = World.GetTileAt(t.X, t.Y + 1);
         if (temp_N != null && temp_N.furniture != null)

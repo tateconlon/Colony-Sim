@@ -40,7 +40,7 @@ public class InventoryManager
         
         if (inventories.ContainsKey(inv.objectType))    //Only need to check key because then there's a list we can remove from
         {
-            inventories[inv.objectType].Remove(inv);
+            inventories[inv.objectType].Remove(inv);   //Only need to do deletes for inventories that were in the list
         }
 
         if (inv.tile != null)
@@ -54,15 +54,15 @@ public class InventoryManager
             inv.character.inventory = null;
         }
         
+        OnInventoryDeleted?.Invoke(inv); 
         Debug.Log($"Deleted Inventory {inv.objectType}");
-        OnInventoryDeleted?.Invoke(inv);
     }
     
     public bool PlaceInventory(Tile tile, Inventory sourceInv)
     {
         if (tile == null) { return false;}
             
-        bool tileWasEmpty = tile._inventory == null;
+        bool tileWasEmpty = tile.inventory == null;
         if (!tile.TryAssignInventory(sourceInv))
         {
             return false;
@@ -73,7 +73,7 @@ public class InventoryManager
 
         if (tileWasEmpty)
         {
-            OnInventoryCreated?.Invoke(tile._inventory);
+            OnInventoryCreated?.Invoke(tile.inventory);
         }
 
         if (!inventories.ContainsKey(sourceInv.objectType))
@@ -81,7 +81,7 @@ public class InventoryManager
             inventories[sourceInv.objectType] = new();
         }
         
-        // Could happen if we merge inv into the tile's _inventory.
+        // Could happen if we merge inv into the tile's inventory.
         // ex: placing 10 steel_plates on top of 20 steel_plates
         if (sourceInv.stackSize == 0)
         {
@@ -90,7 +90,7 @@ public class InventoryManager
 
         if (tileWasEmpty)
         {
-            inventories[sourceInv.objectType].Add(tile._inventory);   //Why don't we just use inv??
+            inventories[sourceInv.objectType].Add(tile.inventory);   //Why don't we just use inv??
         }
         return true;
     }
@@ -107,7 +107,7 @@ public class InventoryManager
         }   
         
         if (!job.recipe.ContainsKey(sourceInv.objectType)) {return false;} //Do not want the inv
-
+        
         Inventory jobInv = job.recipe[sourceInv.objectType];
         
         int combinedCount = jobInv.stackSize + sourceInv.stackSize;
@@ -116,7 +116,7 @@ public class InventoryManager
         int overflow = combinedCount - jobInv.maxStackSize;
         sourceInv.stackSize = Mathf.Max(0, overflow);
 
-        // Could happen if we merge inv into the tile's _inventory.
+        // Could happen if we merge inv into the tile's inventory.
         // ex: placing 10 steel_plates on top of 20 steel_plates
         // Similar to "deleting" the inventory
         if (sourceInv.stackSize == 0)
@@ -151,7 +151,7 @@ public class InventoryManager
         //     OnInventoryCreated?.Invoke(character.inventory);
         // }
 
-        // Could happen if we merge inv into the character's _inventory.
+        // Could happen if we merge inv into the character's inventory.
         // ex: placing 10 steel_plates on top of 20 steel_plates
         if (sourceInv.stackSize == 0)
         {
@@ -174,7 +174,7 @@ public class InventoryManager
     /// <param name="objectType"></param>
     /// <param name="currTile"></param>
     /// <returns></returns>
-    public Inventory GetClosestInventoryOfType(string objectType, Tile currTile, int desiredAmount)
+    public Inventory GetClosestInventoryOfType(string objectType, Tile currTile, int desiredAmount, bool canTakeFromStockpile)
     {
         //FIXME:
         //   a) We are LYING about returning the closest item
@@ -188,7 +188,8 @@ public class InventoryManager
 
         foreach (Inventory inv in inventories[objectType])
         {
-            if (inv.tile != null)
+            //We can take from a stockpile or it's not a stockpile
+            if (inv.tile != null && (canTakeFromStockpile || inv.tile.furniture == null || !inv.tile.furniture.IsStockpile()))
             {
                 return inv;
             }

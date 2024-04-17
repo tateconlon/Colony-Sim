@@ -146,4 +146,16 @@ public class Path_AStar
 
         return path.Count;
     }
+    
+    public static bool TestIfPathable(Tile startTile, Tile destTile, out Path_AStar path)
+    {
+        path = new Path_AStar(startTile.world, startTile, destTile);
+        if (path.Length() == 0)
+        {
+            Debug.Log($"Path_AStar::TestIfPathable: Cannot get from {startTile} to {destTile}");
+            return false;
+        }
+        
+        return true;
+    }
 }

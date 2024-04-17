@@ -17,6 +17,12 @@ public class JobSpriteController : MonoBehaviour
 
     void OnJobCreated(Job _job)
     {
+        if (_job.jobType == null)
+        {
+            //job has no assosiated sprite, just return
+            return;
+        }
+        
         if (job_GameObject_Map.ContainsKey(_job))
         {
             //Debug.Log("OnJobCreated for a jobGO that already exists -- most like due to a job being re-queded instead of created");

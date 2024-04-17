@@ -73,7 +73,11 @@ public class Character : IXmlSerializable
                     {
                         //We are at the job site.
                         //Drop off inventory into the job
-                        currTile.world.inventoryManager.PlaceInventory(myJob, inventory);
+                        if (currTile.world.inventoryManager.PlaceInventory(myJob, inventory))
+                        {
+                            myJob.DoWork(0); //Call OnWorked callback, which things may want to react to that
+                        }
+                        
                         
                         //Are we still carrying something
                         if (inventory.stackSize == 0)
@@ -131,9 +135,15 @@ public class Character : IXmlSerializable
                 
                 //STEP 1: 
                 //If already on a tile with resources the job needs, pick up the required inventory & amount.
-                if (currTile._inventory != null && myJob.DesiresInventoryType(currTile._inventory, out Inventory recipeInv))
+
+                Inventory recipeInv = null;
+                bool currTileHasInventoryWeWant = currTile.inventory != null && myJob.DesiresInventoryType(currTile.inventory, out recipeInv);
+                bool currTileIsNotStockpile = currTile.furniture == null || !currTile.furniture.IsStockpile();
+                bool weCanGrabFromStockpile = myJob.canTakeFromStockpile;
+                if (currTileHasInventoryWeWant
+                    && (currTileIsNotStockpile || weCanGrabFromStockpile))
                 {
-                    currTile.world.inventoryManager.PlaceInventory(this, currTile._inventory, recipeInv.UnfilledStackSize);
+                    currTile.world.inventoryManager.PlaceInventory(this, currTile.inventory, recipeInv.UnfilledStackSize);
                 }
                 else
                 {
@@ -153,7 +163,7 @@ public class Character : IXmlSerializable
                     }
 
                     Inventory supplier = currTile.world.inventoryManager.GetClosestInventoryOfType
-                        (desired.objectType, currTile, desired.UnfilledStackSize);
+                        (desired.objectType, currTile, desired.UnfilledStackSize, myJob.canTakeFromStockpile);
 
                     if (supplier == null)
                     {
@@ -166,7 +176,6 @@ public class Character : IXmlSerializable
 
                     Debug.Log($"Getting {desired.objectType} supplies");
                     destTile = supplier.tile;
-                    //nextTile = null;
                     return;
                 }
             }
@@ -217,7 +226,10 @@ public class Character : IXmlSerializable
 
     bool TryAssignJob(Job j)
     {
-        if (TrySetDestination(j.tile) == false)
+        //We just test pathing, we will assign pathing later
+        //This is because we do not always path towards the job, sometimes we grab materials first
+        //This is just to validate that we can do the job
+        if (Path_AStar.TestIfPathable(currTile, j.tile, out Path_AStar _) == false)
         {
             return false; 
         }
@@ -333,19 +345,7 @@ public class Character : IXmlSerializable
         return true;
     }
     
-    public bool TrySetDestination(Tile destTile, out Path_AStar path)
-    {
-        path = new Path_AStar(currTile.world, currTile, destTile);
-        if (path.Length() == 0)
-        {
-            Debug.LogError($"Character::TrySetDestination: {this} cannot get from {currTile} to {this.destTile}. Setting destination tile to current tile.");
-            // this.destTile = currTile;
-            // pathing = null;
-            return false;
-        }
-        
-        return true;
-    }
+
 
     //Job completed or cancelled
     void OnJobEnded(Job _job)
@@ -397,7 +397,7 @@ public class Character : IXmlSerializable
         // //THIS DOESN'T GIVE DESIRED BEHAVIOUR BECAUSE IT DOESN'T CHECK AMOUNT
         // //AND SPLIT THE INVENTORY INTO 2
         //
-        // //_inventory is null. Can't just directly assign it because
+        // //inventory is null. Can't just directly assign it because
         // //Inventory manager needs to know it was created.
         // inventory = inv.Clone();
         // //inventory.tile = this; From tile code

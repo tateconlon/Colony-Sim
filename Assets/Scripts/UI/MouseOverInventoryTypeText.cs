@@ -22,12 +22,12 @@ public class MouseOverInventoryTypeText : MonoBehaviour
             return;
         }
         
-        if (t._inventory == null)
+        if (t.inventory == null)
         {
             myText.text = $"Inventory Type: NULL";
             return;
         }
         
-        myText.text = $"Inventory Type: {t._inventory.objectType.ToString()}";
+        myText.text = $"Inventory Type: {t.inventory.objectType.ToString()}";
     }
 }

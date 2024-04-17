@@ -11,18 +11,23 @@
      // working at a desk, and maybe even fighting enemies.
      
      public Tile tile;
-     float jobTime;
+     public float jobTime { get; protected set; }
+
+     public bool standAdjacent = true;
 
      //FIXME: This will change since jobs can be more than just furniture
      public string jobType { get; protected set; }
 
      public Action<Job> OnJobCompleted;
      public Action<Job> OnJobCancelled;
+     public Action<Job> OnJobWorked;
      public Action<Job> OnJobAbandoned; //Use Scriptable objects?
+
+     public bool canTakeFromStockpile = true;
 
      public Dictionary<string, Inventory> recipe;
 
-     public Job(Tile tile, Action<Job> onJobCompleted, string jobType, float jobTime, Inventory[] inventoryReqs)
+     public Job(Tile tile, Action<Job> onJobCompleted, string jobType, float jobTime, Inventory[] _recipe)
      {
          this.tile = tile;
          this.OnJobCompleted += onJobCompleted;
@@ -30,9 +35,9 @@
          this.jobTime = jobTime;
 
          recipe = new Dictionary<string, Inventory>();
-         if (inventoryReqs != null)
+         if (_recipe != null)
          {
-             foreach (Inventory inventoryReq in inventoryReqs)
+             foreach (Inventory inventoryReq in _recipe)
              {
                  if (!recipe.ContainsKey(inventoryReq.objectType))
                  { 
@@ -68,7 +73,14 @@
 
      public void DoWork(float workTime)
      {
+         if (HasAllMaterial() == false)
+         {
+             Debug.Log("Tried to do work on a job that doesn't have all it's materials");
+             OnJobWorked?.Invoke(this);
+             return;
+         }
          jobTime -= workTime;
+         OnJobWorked?.Invoke(this);
      
          if (jobTime <= 0)
          {
@@ -82,6 +94,8 @@
      {
          Debug.Log("Cancelling Job");
          OnJobCancelled?.Invoke(this);
+
+         //tile.world.jobQueue.Remove(this); ??
      }
      
      public void AbandonJob(Job j)

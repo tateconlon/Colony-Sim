@@ -40,7 +40,7 @@ public class Tile : IXmlSerializable
 
     public Room room { get; set; }
 
-    public Inventory _inventory { get; protected set; }
+    public Inventory inventory { get; protected set; }
     public Furniture furniture { get; protected set; }
     public Job pendingFurnitureJob;
 
@@ -116,41 +116,36 @@ public class Tile : IXmlSerializable
         if (inv == null)
         {
             //Remove Installed Object
-            _inventory = null;
+            inventory = null;
             OnTileTypeChanged?.Invoke(this);
             return true;
         }
 
-        if (_inventory != null)
+        if (inventory != null)
         {
-            if (_inventory.objectType != inv.objectType)
+            if (inventory.objectType != inv.objectType)
             {
-                Debug.LogError($"Tried to Install Inventory {inv.objectType} on tile {X},{Y} that already has an {_inventory.objectType} on it!");
+                Debug.LogError($"Tried to Install Inventory {inv.objectType} on tile {X},{Y} that already has an {inventory.objectType} on it!");
                 return false;
             } 
-            // else if (_inventory.stackSize + inv.stackSize > inv.maxStackSize)
-            // {
-            //     Debug.LogError($"Tried to Install Inventory that exceeds max size! {_inventory.objectType}: {_inventory.stackSize} + {inv.stackSize} > {inv.stackSize} on tile {X},{Y}");
-            //     return false;
-            // }
 
             int numToMove = inv.stackSize;
-            if (_inventory.stackSize + numToMove > _inventory.maxStackSize)
+            if (inventory.stackSize + numToMove > inventory.maxStackSize)
             {   //We'll only add the amount that makes us reach the max stack size
-                numToMove = _inventory.maxStackSize - _inventory.stackSize;
+                numToMove = inventory.maxStackSize - inventory.stackSize;
             }
 
-            _inventory.stackSize += numToMove;
+            inventory.stackSize += numToMove;
             inv.stackSize -= numToMove;
             
             return true;
         }
 
-        //_inventory is null. Can't just directly assign it because
+        //inventory is null. Can't just directly assign it because
         //Inventory manager needs to know it was created.
-        _inventory = inv.Clone();
-        _inventory.tile = this;
-        _inventory.CallOnChanged(); //Should this be OnCreated???
+        inventory = inv.Clone();
+        inventory.tile = this;
+        inventory.CallOnChanged(); //Should this be OnCreated???
         
         //We do this as a type of "return value" in InventoryManager.PlaceInventory.
         //We check if inv.stackSize == 0, then remove it.

@@ -16,7 +16,7 @@ public class Furniture : IXmlSerializable
 
     //This represents the BASE tile of the object
     //However, large objects may actually OCCUPY multiple tiles
-    public Tile tileOwner { get; protected set; }
+    public Tile tile { get; protected set; }
 
     //This is an id that can be used to query across the game
     public string objectType { get; protected set; }
@@ -30,7 +30,11 @@ public class Furniture : IXmlSerializable
     int width;
     int height;
 
+    public Color tint = Color.white;
+
     public Action<Furniture> OnChanged;
+
+    List<Job> jobs = new(); //The furniture's jobs (like a workbench wanting someone to make something)
     
     Func<Tile, bool> funcPositionValidation;    //List of functions?
     
@@ -47,6 +51,7 @@ public class Furniture : IXmlSerializable
         this.height = other.height;
         this.linksToNeighbours = other.linksToNeighbours;
         this.roomEnclosure = other.roomEnclosure;
+        this.tint = other.tint;
 
         this.furnParams = new Dictionary<string, float>(other.furnParams);
         if (other.updateActions != null)
@@ -62,6 +67,12 @@ public class Furniture : IXmlSerializable
             {
                 this.IsEnterable += (Func<Furniture, Enterability>)del;
             }
+        }
+
+        jobs = new List<Job>();
+        foreach (Job otherJob in other.jobs)
+        {
+            jobs.Add(otherJob);
         }
     }
 
@@ -96,7 +107,7 @@ public class Furniture : IXmlSerializable
         }
             
         Furniture retVal = new Furniture(prototype);
-        retVal.tileOwner = tileOwner;
+        retVal.tile = tileOwner;
 
         if (!tileOwner.TryAssignFurniture(retVal))
         {
@@ -188,6 +199,40 @@ public class Furniture : IXmlSerializable
         return __IsValidPosition(tile);
     }
 
+    public int JobCount()
+    {
+        return jobs.Count();
+    }
+
+    public void AddJob(Job j)
+    {
+        jobs.Add(j);
+        tile.world.jobQueue.Enqueue(j);
+    }
+
+    public void RemoveJob(Job j)
+    {
+        if (jobs.Remove(j))
+        {
+            j.CancelJob();
+            tile.world.jobQueue.Remove(j);
+        }
+    }
+
+    public void ClearJobs()
+    {
+        foreach (Job j in jobs)
+        {
+            //j.CancelJob() ???
+            RemoveJob(j);
+        }
+    }
+
+    public bool IsStockpile()
+    {
+        return objectType == "stockpile";
+    }
+
     #region SAVING_AND_LOADING
     
     public XmlSchema GetSchema()
@@ -215,8 +260,8 @@ public class Furniture : IXmlSerializable
 
     public void WriteXml(XmlWriter writer)
     {
-        writer.WriteAttributeString("X", tileOwner.X.ToString());
-        writer.WriteAttributeString("Y", tileOwner.Y.ToString());
+        writer.WriteAttributeString("X", tile.X.ToString());
+        writer.WriteAttributeString("Y", tile.Y.ToString());
         writer.WriteAttributeString("objectType", objectType);
         //writer.WriteAttributeString("movementCost", movementCost.ToString());
 

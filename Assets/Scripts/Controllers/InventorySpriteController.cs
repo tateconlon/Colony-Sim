@@ -79,7 +79,7 @@ public class InventorySpriteController : MonoBehaviour
     {
         if (!inventory_GameObject_Map.ContainsKey(inv))
         {
-            Debug.LogError($"Trying to destroy inventory {inv}, but it already exists!");
+            //Ignore this inventory
             return;
         }
 
@@ -92,7 +92,7 @@ public class InventorySpriteController : MonoBehaviour
     {
         if (!inventory_GameObject_Map.TryGetValue(inv, out GameObject inv_go))
         {
-            Debug.LogError($"Could not find Inventory {inv}'s Game Object");
+            //This sprite controller doesn't have to care about the game object
             return;
         }
 

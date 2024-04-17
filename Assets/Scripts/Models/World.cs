@@ -141,6 +141,23 @@ public class World : IXmlSerializable
         doorPrototype.updateActions += FurnitureActions.Door_UpdateAction;
         doorPrototype.IsEnterable += FurnitureActions.Door_IsEnterable;
         
+        Furniture stockpilePrototype = new Furniture(
+            "stockpile", 
+            1 ,  //impassable
+            1,
+            1,
+            true,
+            false);
+        stockpilePrototype.tint = new Color(186 / 255f, 31f / 255, 31f / 255f, 1f);
+        stockpilePrototype.updateActions += FurnitureActions.Stockpile_UpdateAction;
+        furniturePrototypes.Add(stockpilePrototype.objectType, stockpilePrototype);
+        furnitureJobPrototypes.Add(stockpilePrototype.objectType,
+            new Job(null, 
+                FurnitureActions.JobComplete_FurnitureBuilding,
+                stockpilePrototype.objectType,
+                -1f,    //Negatives are special, means create instant
+                null));
+
         
     }
 
@@ -324,20 +341,20 @@ public class World : IXmlSerializable
         }
         
         //DEBUG ONLY: remove me later
-        Inventory inventoryItem = new Inventory("steel_plate", 1, 50);
+        Inventory inventoryItem = new Inventory("steel_plate", 50, 50);
         Tile t = GetTileAt(51, 51);
         inventoryManager.PlaceInventory(t, inventoryItem);
-        //OnInventoryCreated?.Invoke(t._inventory);
+        //OnInventoryCreated?.Invoke(t.inventory);
         
         Inventory inventoryItem2 = new Inventory("steel_plate", 2, 50);
         t = GetTileAt(50, 53);
         inventoryManager.PlaceInventory(t, inventoryItem2);
-        //OnInventoryCreated?.Invoke(t._inventory);
+        //OnInventoryCreated?.Invoke(t.inventory);
         
         Inventory inventoryItem4 = new Inventory("steel_plate", 1, 50);
         t = GetTileAt(49, 51);
         inventoryManager.PlaceInventory(t, inventoryItem4);
-        //OnInventoryCreated?.Invoke(t._inventory);
+        //OnInventoryCreated?.Invoke(t.inventory);
 
     }
 
