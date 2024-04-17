@@ -30,13 +30,20 @@ public class JobSpriteController : MonoBehaviour
         }
         //Make Sprite
         Sprite sprite = fsc.GetSpriteForFurniture(_job.jobType);
-        
+
+        Furniture jobFurniture = WorldController.Instance.World.GetFurniturePrototype(_job.jobType);
+
         //Do visuals
         Tile tile_data = _job.tile;
                 
         GameObject jobGO = new GameObject();
         jobGO.name = $"{_job.jobType}_{tile_data.X}_{tile_data.Y}";
-        jobGO.transform.position = new Vector3(tile_data.X, tile_data.Y, 0);
+        
+        //Offset by half a tile for every extra width over 1.
+        float xOffset = (jobFurniture.width - 1) / 2f;
+        float yOffset = (jobFurniture.height - 1) / 2f;
+        
+        jobGO.transform.position = new Vector3(tile_data.X + xOffset, tile_data.Y + yOffset, 0);
         jobGO.transform.SetParent(transform);
         
         //FIXME: this is hardcoded for doors, but it should not be eventually

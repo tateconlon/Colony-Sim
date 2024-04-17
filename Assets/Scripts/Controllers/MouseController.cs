@@ -52,22 +52,7 @@ public class MouseController : MonoBehaviour
         lastFramePos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         lastFramePos.z = 0;
     }
-    //
-    // void UpdateCursor_UPDATE()
-    // {
-    //     //Update selector position
-    //     Tile tileUnderMouse = WorldController.Instance.GetTileAtWorldCoord(currFramePos);
-    //     if (tileUnderMouse == null)
-    //     {
-    //         selectionCursor.SetActive(false);
-    //     }
-    //     else
-    //     {
-    //         selectionCursor.SetActive(true);
-    //         Vector3 selectionCursorPos = new Vector3(tileUnderMouse.X, tileUnderMouse.Y, 0);
-    //         selectionCursor.transform.position = selectionCursorPos;
-    //     }
-    // }
+
 
     private Dictionary<Tile, GameObject> dragPreviewGO = new();
     private bool isDragging = false;

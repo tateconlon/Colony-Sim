@@ -59,7 +59,12 @@ public class FurnitureSpriteController : MonoBehaviour
         GameObject furn_go = new GameObject();
 
         furn_go.name = $"{createdObj.objectType}_{tile_data.X}_{tile_data.Y}";
-        furn_go.transform.position = new Vector3(tile_data.X, tile_data.Y, 0);
+
+        //Offset by half a tile for every extra width over 1.
+        float xOffset = (createdObj.width - 1) / 2f;
+        float yOffset = (createdObj.height - 1) / 2f;
+        
+        furn_go.transform.position = new Vector3(tile_data.X + xOffset, tile_data.Y + yOffset, 0);
         furn_go.transform.SetParent(transform);
         
         //FIXME: this is hardcoded for doors, but it should not be eventually

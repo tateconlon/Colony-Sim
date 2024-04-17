@@ -47,7 +47,7 @@ public class BuildModeController : MonoBehaviour
                     }
                     else
                     {
-                        Debug.LogError($"There is no Furniture Job Prototype for {furnitureType}");
+                        Debug.Log($"There is no Furniture Job Prototype for {furnitureType}");
                         j = new Job(tile,
                         FurnitureActions.JobComplete_FurnitureBuilding,
                         furnitureType, 

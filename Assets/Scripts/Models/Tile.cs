@@ -91,23 +91,48 @@ public class Tile : IXmlSerializable
 
         return Enterability.Yes;
     }
-    public bool TryAssignFurniture(Furniture objInstance)
+
+    public bool UninstallFurniture()
     {
-        if (objInstance == null)
+        furniture = null;
+        OnTileTypeChanged?.Invoke(this);
+        return true;
+    }
+    
+    public bool TryPlaceFurniture(Furniture furnInstance)
+    {
+        if (furnInstance == null)
         {
             //Remove Installed Object
-            furniture = null;
-            OnTileTypeChanged?.Invoke(this);
+            //What if we have multi-tile furniture
+            //Need 
+            UninstallFurniture();
             return true;
         }
-
-        if (furniture != null)
+        
+        // This check is in __IsValidPosition(Tile tile)
+        // if (furniture != null)
+        // {
+        //     Debug.LogError($"Tried to Install Furniture {furnInstance.objectType} on tile {X},{Y} that already has an {furniture.objectType} on it!");
+        //     return false;
+        // }
+        
+        if (furnInstance.IsPositionValid(this) == false)
         {
-            Debug.LogError($"Tried to Install Furniture {objInstance.objectType} on tile {X},{Y} that already has an {furniture.objectType} on it!");
+            Debug.LogError("Trying to assign a furniture to a tile that isn't valid");
             return false;
         }
+        
+        for (int x = X; x < X + furnInstance.width; x++)
+        {
+            for (int y = Y; y < Y + furnInstance.height; y++)
+            {
+                Tile testTile = world.GetTileAt(x, y);
+                testTile.furniture = furnInstance;
+            }
+        }
 
-        furniture = objInstance;
+        furniture = furnInstance;
         return true;
     }
     

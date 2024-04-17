@@ -27,8 +27,8 @@ public class Furniture : IXmlSerializable
 
     public bool roomEnclosure; //Does this help define the border of a room? ex: Wall, door, window
 
-    int width;
-    int height;
+    public int width { get; protected set; }
+    public int height { get; protected set; }
 
     public Color tint = Color.white;
 
@@ -52,6 +52,7 @@ public class Furniture : IXmlSerializable
         this.linksToNeighbours = other.linksToNeighbours;
         this.roomEnclosure = other.roomEnclosure;
         this.tint = other.tint;
+        
 
         this.furnParams = new Dictionary<string, float>(other.furnParams);
         if (other.updateActions != null)
@@ -68,6 +69,15 @@ public class Furniture : IXmlSerializable
                 this.IsEnterable += (Func<Furniture, Enterability>)del;
             }
         }
+
+        if (other.funcPositionValidation != null)
+        {
+            foreach (Delegate del in other.funcPositionValidation.GetInvocationList())
+            {
+                this.funcPositionValidation += (Func<Tile, bool>) del;
+            }
+        }
+        
 
         jobs = new List<Job>();
         foreach (Job otherJob in other.jobs)
@@ -109,7 +119,7 @@ public class Furniture : IXmlSerializable
         Furniture retVal = new Furniture(prototype);
         retVal.tile = tileOwner;
 
-        if (!tileOwner.TryAssignFurniture(retVal))
+        if (!tileOwner.TryPlaceFurniture(retVal))
         {
             //Couldn't place tile (it was probably occupied)
             return null;
@@ -117,6 +127,8 @@ public class Furniture : IXmlSerializable
 
         //When we place it, let our linkedNeighbours know
         //They may need to change Graphically
+        //This will not work for non 1x1 furniture since we're only starting from the tile owner
+        //And not factoring in that the furniture is wide or tall
         if (retVal.linksToNeighbours)
         {
             Tile t = tileOwner;
@@ -188,8 +200,17 @@ public class Furniture : IXmlSerializable
     //TODO: Move these into static position library
     public bool __IsValidPosition(Tile tile)
     {
-        if (tile.TileType != TileType.Floor) return false;
-        if (tile.furniture != null) return false;
+        if (tile == null) return false;
+        for (int x = tile.X; x < tile.X + width; x++)
+        {
+            for (int y = tile.Y; y < tile.Y + height; y++)
+            {
+                Tile testTile = tile.world.GetTileAt(x, y);
+                if (testTile == null) return false;
+                if (tile.TileType != TileType.Floor) return false;
+                if (tile.furniture != null) return false;
+            }
+        }
         
         return true;
     }

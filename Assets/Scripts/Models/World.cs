@@ -158,6 +158,26 @@ public class World : IXmlSerializable
                 -1f,    //Negatives are special, means create instant
                 null));
 
+        Furniture oxygenGeneratorPrototype = new Furniture(
+            "oxygen_generator", 
+            10 ,  //crawl through the pipes
+            2,
+            2,
+            false,
+            true);
+        furniturePrototypes.Add(oxygenGeneratorPrototype.objectType, oxygenGeneratorPrototype);
+        // furnitureJobPrototypes.Add(wallPrototype.objectType,
+        //     new Job(null, 
+        //         FurnitureActions.JobComplete_FurnitureBuilding,
+        //         wallPrototype.objectType,
+        //         1f,
+        //         new Inventory[]{ new Inventory("steel_plate", 0, 2) }));
+        //
+
+        doorPrototype.SetParameter("openness", 0f);
+        doorPrototype.SetParameter("is_opening", 0f);
+        doorPrototype.updateActions += FurnitureActions.Door_UpdateAction;
+        doorPrototype.IsEnterable += FurnitureActions.Door_IsEnterable;
         
     }
 
@@ -236,33 +256,35 @@ public class World : IXmlSerializable
     //TODO: This function assumes 1x1 tiles with no rotation
     public Furniture TryPlaceFurniture(string objectType, Tile t)
     {
-        if (furniturePrototypes.TryGetValue(objectType, out Furniture obj))
+        if (!furniturePrototypes.TryGetValue(objectType, out Furniture obj))
         {
-            Furniture newFurn = Furniture.PlaceInstance(obj, t);
-            
-            //TODO: Handle the null as a destruction. This currently doesn't make sense
-            if (newFurn == null) return null;
-
-            OnFurnitureCreated?.Invoke(newFurn);
-
-            if (newFurn.roomEnclosure)
-            {
-                Room.DoRoomFloodFill(newFurn);
-            }
-
-            if (newFurn.movementCost != 1)
-            {
-                //Since tiles return movement cost as their base cost multiplied
-                //by the furniture's movement cost, a furniture movement cost
-                //of exactly 1 doesn't impact our pathfinding system, so we can
-                //optimize by not having to invalidate tilegraph when the movementCost is 1 (equal to empty floor tile)
-                InvalidateTileGraph();
-            }
-            
-            furnitures.Add(newFurn);
-            
-            return newFurn;
+            return null;
         }
+
+        Furniture newFurn = Furniture.PlaceInstance(obj, t);
+            
+        //TODO: Handle the null as a destruction. This currently doesn't make sense
+        if (newFurn == null) return null;
+
+        OnFurnitureCreated?.Invoke(newFurn);
+
+        if (newFurn.roomEnclosure)
+        {
+            Room.DoRoomFloodFill(newFurn);
+        }
+
+        if (newFurn.movementCost != 1)
+        {
+            //Since tiles return movement cost as their base cost multiplied
+            //by the furniture's movement cost, a furniture movement cost
+            //of exactly 1 doesn't impact our pathfinding system, so we can
+            //optimize by not having to invalidate tilegraph when the movementCost is 1 (equal to empty floor tile)
+            InvalidateTileGraph();
+        }
+        
+        furnitures.Add(newFurn);
+        
+        return newFurn;
 
         return null;
     }
